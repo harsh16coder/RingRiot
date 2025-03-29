@@ -1,0 +1,10 @@
+{
+    "protoc": {
+        "path": "protoc",
+        "compile_on_save": true,
+        "options": [
+            "-I=c:\\Users\\harsh\\OneDrive\\Desktop\\RingRiot\\shared",
+            "--go_out=server",
+        ]
+    }
+}
