@@ -7,11 +7,25 @@ import (
 	"server/pkg/packets"
 )
 
+type ClientStateHandler interface {
+	Name() string
+
+	// inject the client into the state handler
+	SetClient(client ClientInterfacer)
+
+	OnEnter()
+	HandlerMessage(senderId uint64, message packets.Msg)
+
+	//clean up the state handler and perform any last action
+	OnExit()
+}
+
 // A structure for the connected client to interface with the hub
 type ClientInterfacer interface {
 	Id() uint64
 	ProcessMessage(senderId uint64, message packets.Msg)
 
+	SetState(newState ClientStateHandler)
 	// Sets the client's ID and anything else that needs to be initialized
 	Initialize(id uint64)
 
