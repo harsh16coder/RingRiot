@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://5h0kmysjfhoh"]
 
-[ext_resource type="Script" uid="uid://behp77llgp0y0" path="res://classes/log/log.gd" id="1_cs1qp"]
+[ext_resource type="Script" uid="uid://b4el1fjc2gkm1" path="res://classes/log/log.gd" id="1_cs1qp"]
 
 [node name="Log" type="RichTextLabel"]
 anchors_preset = 15

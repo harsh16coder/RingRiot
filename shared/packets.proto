@@ -22,6 +22,3 @@ message Packet {
         DenyResponseMessage deny_response = 7;
     }
 }
-
-
-

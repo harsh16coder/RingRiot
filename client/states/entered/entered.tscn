@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://bx87lmr8772k"]
 
-[ext_resource type="Script" uid="uid://63ee8xdj0k84" path="res://states/entered/entered.gd" id="1_ltgjr"]
-[ext_resource type="Script" uid="uid://behp77llgp0y0" path="res://classes/log/log.gd" id="2_cjx30"]
+[ext_resource type="Script" uid="uid://br56kwk026lus" path="res://states/entered/entered.gd" id="1_ltgjr"]
+[ext_resource type="Script" uid="uid://b4el1fjc2gkm1" path="res://classes/log/log.gd" id="2_cjx30"]
 
 [node name="Entered" type="Node"]
 script = ExtResource("1_ltgjr")

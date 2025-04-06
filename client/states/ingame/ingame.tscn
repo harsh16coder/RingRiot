@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://bobyf230fc7bh"]
 
-[ext_resource type="Script" uid="uid://b8m4hp3dthrh5" path="res://states/ingame/ingame.gd" id="1_0uskn"]
-[ext_resource type="Script" uid="uid://behp77llgp0y0" path="res://classes/log/log.gd" id="2_q22go"]
+[ext_resource type="Script" uid="uid://c8uc7dhcmnrqk" path="res://states/ingame/ingame.gd" id="1_0uskn"]
+[ext_resource type="Script" uid="uid://b4el1fjc2gkm1" path="res://classes/log/log.gd" id="2_q22go"]
 
 [node name="InGame" type="Node"]
 script = ExtResource("1_0uskn")
