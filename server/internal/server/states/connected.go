@@ -7,6 +7,7 @@ import (
 	"log"
 	"server/internal/server"
 	"server/internal/server/db"
+	"server/internal/server/objects"
 	"server/pkg/packets"
 	"strings"
 
@@ -71,6 +72,13 @@ func (c *Connected) handleLoginRequest(senderId uint64, message *packets.Packet_
 
 	c.logger.Printf("User %s logged in successfully", username)
 	c.client.SocketSend(packets.NewOkResponse())
+
+	//Transition from connected state to Ingame state
+	c.client.SetState(&InGame{
+		player: &objects.Player{
+			Name: username,
+		},
+	})
 
 }
 
