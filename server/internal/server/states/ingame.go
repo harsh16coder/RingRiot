@@ -41,6 +41,14 @@ func (g *InGame) OnEnter() {
 
 	// Send the player's initial state to the client
 	g.client.SocketSend(packets.NewPlayer(g.client.Id(), g.player))
+
+	// Send the spores to the client in the background
+	go func() {
+		g.client.SharedGameObjects().Spores.ForEach(func(sporeId uint64, spore *objects.Spore) {
+			time.Sleep(5 * time.Millisecond)
+			g.client.SocketSend(packets.NewSpore(sporeId, spore))
+		})
+	}()
 }
 
 func (g *InGame) HandlerMessage(senderId uint64, message packets.Msg) {
@@ -49,6 +57,8 @@ func (g *InGame) HandlerMessage(senderId uint64, message packets.Msg) {
 		g.handlePlayer(senderId, message)
 	case *packets.Packet_PlayerDirection:
 		g.handlePlayerDirection(senderId, message)
+	case *packets.Packet_Chat:
+		g.handleChatMessage(senderId, message)
 	}
 }
 
@@ -65,6 +75,13 @@ func (g *InGame) handlePlayerDirection(senderId uint64, message *packets.Packet_
 	}
 }
 
+func (g *InGame) handleChatMessage(senderId uint64, message *packets.Packet_Chat) {
+	if senderId == g.client.Id() {
+		g.client.Broadcast(message)
+	} else {
+		g.client.SocketSendAs(message, senderId)
+	}
+}
 func (g *InGame) handlePlayer(senderId uint64, message *packets.Packet_Player) {
 	if senderId == g.client.Id() {
 		g.logger.Println("Received player message from our own client, ignoring")

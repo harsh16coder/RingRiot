@@ -13,7 +13,7 @@ script = ExtResource("1_0uskn")
 texture_repeat = 2
 texture = ExtResource("2_wuwgw")
 region_enabled = true
-region_rect = Rect2(0, 0, 10000, 100000)
+region_rect = Rect2(0, 0, 100000, 100000)
 
 [node name="UI" type="CanvasLayer" parent="."]
 
