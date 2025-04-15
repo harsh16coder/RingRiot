@@ -31,18 +31,43 @@ func _handle_player_msg(sender_id: int, player_msg: packets.PlayerMessage) -> vo
 	
 	var is_player := actor_id == GameManager.client_id
 	if actor_id not in _players:
-		# This is a new player, so we need to create a new actor
-		var actor := Actor.instantiate(actor_id, actor_name, x, y, radius, speed, is_player)
-		_world.add_child(actor)
-		_players[actor_id] = actor
+		_add_actor(actor_id, actor_name, x, y, radius, speed, is_player)
 	else:
-		# This is an existing player, so we need to update their position
-		var actor := _players[actor_id]
+		var direction := player_msg.get_direction()
+		_update_actor(actor_id, x, y, direction, speed, radius, is_player)
+
+func _add_actor(actor_id: int, actor_name: String, x: float, y: float, radius: float, speed: float, is_player: bool) -> void:
+	var actor := Actor.instantiate(actor_id, actor_name, x, y, radius, speed, is_player)
+	_world.add_child(actor)
+	_players[actor_id] = actor
+	if is_player:
+		actor.area_entered.connect(_on_player_area_entered)
+
+func _on_player_area_entered(area: Area2D) -> void:
+	if area is Spore:
+		_consume_spore(area as Spore)
+
+func _consume_spore(spore: Spore) -> void:
+	var packet := packets.Packet.new()
+	var spore_consumed_msg := packet.new_spore_consumed()
+	spore_consumed_msg.set_spore_id(spore.spore_id)
+	WS.send(packet)
+	_remove_spore(spore)
+
+func _remove_spore(spore: Spore) -> void:
+	_spores.erase(spore.spore_id)
+	spore.queue_free()
+
+func _update_actor(actor_id: int, x: float, y: float, direction: float, speed: float, radius: float, is_player: bool) -> void:
+	var actor := _players[actor_id]
+	actor.radius = radius
+	if actor.position.distance_squared_to(Vector2(x, y)) > 100:
 		actor.position.x = x
 		actor.position.y = y
-		var direction := player_msg.get_direction()
-		actor.velocity = speed * Vector2.from_angle(direction)
-
+	if not is_player:
+		actor.velocity = Vector2.from_angle(direction) * speed
+		
+		
 func _on_ws_packet_received(packet: packets.Packet) -> void:
 	var sender_id := packet.get_sender_id()
 	if packet.has_chat():

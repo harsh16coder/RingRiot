@@ -59,6 +59,8 @@ func (g *InGame) HandlerMessage(senderId uint64, message packets.Msg) {
 		g.handlePlayerDirection(senderId, message)
 	case *packets.Packet_Chat:
 		g.handleChatMessage(senderId, message)
+	case *packets.Packet_SporeConsumed:
+		g.logger.Printf("Spore %d consumed by client %d", message.SporeConsumed.SporeId, senderId)
 	}
 }
 
