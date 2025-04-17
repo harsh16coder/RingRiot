@@ -43,12 +43,9 @@ func (g *InGame) OnEnter() {
 	g.client.SocketSend(packets.NewPlayer(g.client.Id(), g.player))
 
 	// Send the spores to the client in the background
-	go func() {
-		g.client.SharedGameObjects().Spores.ForEach(func(sporeId uint64, spore *objects.Spore) {
-			time.Sleep(5 * time.Millisecond)
-			g.client.SocketSend(packets.NewSpore(sporeId, spore))
-		})
-	}()
+	// Added logic send in batches
+	go g.sendInitialSpores(20, 50*time.Millisecond)
+
 }
 
 func (g *InGame) HandlerMessage(senderId uint64, message packets.Msg) {
@@ -124,4 +121,22 @@ func (g *InGame) syncPlayer(delta float64) {
 	updatePacket := packets.NewPlayer(g.client.Id(), g.player)
 	g.client.Broadcast(updatePacket)
 	go g.client.SocketSend(updatePacket)
+}
+
+func (g *InGame) sendInitialSpores(batchSize int, delayBetweenBatches time.Duration) {
+	sporesBatch := make(map[uint64]*objects.Spore, batchSize)
+
+	g.client.SharedGameObjects().Spores.ForEach(func(sporeId uint64, spore *objects.Spore) {
+		sporesBatch[sporeId] = spore
+
+		if len(sporesBatch) >= batchSize {
+			g.client.SocketSend(packets.NewSporesBatch(sporesBatch))
+			sporesBatch = make(map[uint64]*objects.Spore, batchSize)
+			time.Sleep(delayBetweenBatches)
+		}
+	})
+	// Send any remaining spores
+	if len(sporesBatch) > 0 {
+		g.client.SocketSend(packets.NewSporesBatch(sporesBatch))
+	}
 }
