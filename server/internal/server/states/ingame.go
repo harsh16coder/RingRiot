@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"math"
-	"math/rand/v2"
 	"server/internal/server"
 	"server/internal/server/objects"
 	"server/pkg/packets"
@@ -34,8 +33,7 @@ func (g *InGame) OnEnter() {
 	go g.client.SharedGameObjects().Players.Add(g.player, g.client.Id())
 
 	// Set the initial properties of the player
-	g.player.X = rand.Float64() * 1000
-	g.player.Y = rand.Float64() * 1000
+	g.player.X, g.player.Y = objects.SpawnCoords(g.player.Radius, g.client.SharedGameObjects().Players, nil)
 	g.player.Speed = 150.0
 	g.player.Radius = 20.0
 
@@ -60,6 +58,8 @@ func (g *InGame) HandlerMessage(senderId uint64, message packets.Msg) {
 		g.handleSporeConsumed(senderId, message)
 	case *packets.Packet_PlayerConsumed:
 		g.handlePlayerConsumed(senderId, message)
+	case *packets.Packet_Spore:
+		g.handleSpore(senderId, message)
 	}
 }
 
@@ -152,6 +152,10 @@ func (g *InGame) getOtherPlayer(otherId uint64) (*objects.Player, error) {
 		return nil, fmt.Errorf("player with ID %d does not exist", otherId)
 	}
 	return other, nil
+}
+
+func (g *InGame) handleSpore(senderId uint64, message *packets.Packet_Spore) {
+	g.client.SocketSendAs(message, senderId)
 }
 
 func (g *InGame) handlePlayerDirection(senderId uint64, message *packets.Packet_PlayerDirection) {
