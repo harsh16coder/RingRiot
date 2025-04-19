@@ -57,8 +57,41 @@ func (g *InGame) HandlerMessage(senderId uint64, message packets.Msg) {
 	case *packets.Packet_Chat:
 		g.handleChatMessage(senderId, message)
 	case *packets.Packet_SporeConsumed:
-		g.logger.Printf("Spore %d consumed by client %d", message.SporeConsumed.SporeId, senderId)
+		g.handleSporeConsumed(senderId, message)
 	}
+}
+
+func (g *InGame) handleSporeConsumed(senderId uint64, message *packets.Packet_SporeConsumed) {
+	if senderId != g.client.Id() {
+		g.client.SocketSendAs(message, senderId)
+		return
+	}
+
+	// If the spore was supposedly consumed by our own player, we need to verify the plausibility of the event
+	errMsg := "Could not verify spore consumption: "
+
+	// First check if the spore exists
+	sporeId := message.SporeConsumed.SporeId
+	spore, err := g.getSpore(sporeId)
+	if err != nil {
+		g.logger.Println(errMsg + err.Error())
+		return
+	}
+
+	// Next, check if the spore is close enough to the player to be consumed
+	err = g.validatePlayerCloseToObject(spore.X, spore.Y, spore.Radius, 10)
+	if err != nil {
+		g.logger.Println(errMsg + err.Error())
+		return
+	}
+
+	// If we made it this far, the spore consumption is valid, so grow the player, remove the spore, and broadcast the event
+	sporeMass := radToMass(spore.Radius)
+	g.player.Radius = g.nextRadius(sporeMass)
+
+	go g.client.SharedGameObjects().Spores.Remove(sporeId)
+
+	g.client.Broadcast(message)
 }
 
 func (g *InGame) handlePlayerDirection(senderId uint64, message *packets.Packet_PlayerDirection) {
@@ -139,4 +172,40 @@ func (g *InGame) sendInitialSpores(batchSize int, delayBetweenBatches time.Durat
 	if len(sporesBatch) > 0 {
 		g.client.SocketSend(packets.NewSporesBatch(sporesBatch))
 	}
+}
+
+func (g *InGame) getSpore(sporeId uint64) (*objects.Spore, error) {
+	spore, exists := g.client.SharedGameObjects().Spores.Get(sporeId)
+	if !exists {
+		return nil, fmt.Errorf("spore with ID %d does not exist", sporeId)
+	}
+	return spore, nil
+}
+
+func (g *InGame) validatePlayerCloseToObject(objX, objY, objRadius, buffer float64) error {
+	realDX := g.player.X - objX
+	realDY := g.player.Y - objY
+	realDistSq := realDX*realDX + realDY*realDY
+
+	thresholdDist := g.player.Radius + buffer + objRadius
+	thresholdDistSq := thresholdDist * thresholdDist
+
+	if realDistSq > thresholdDistSq {
+		return fmt.Errorf("player is too far from the object (distSq: %f, thresholdSq: %f)", realDistSq, thresholdDistSq)
+	}
+	return nil
+}
+
+func radToMass(radius float64) float64 {
+	return math.Pi * radius * radius
+}
+
+func massToRad(mass float64) float64 {
+	return math.Sqrt(mass / math.Pi)
+}
+
+func (g *InGame) nextRadius(massDiff float64) float64 {
+	oldMass := radToMass(g.player.Radius)
+	newMass := oldMass + massDiff
+	return massToRad(newMass)
 }
