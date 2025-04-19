@@ -58,6 +58,8 @@ func (g *InGame) HandlerMessage(senderId uint64, message packets.Msg) {
 		g.handleChatMessage(senderId, message)
 	case *packets.Packet_SporeConsumed:
 		g.handleSporeConsumed(senderId, message)
+	case *packets.Packet_PlayerConsumed:
+		g.handlePlayerConsumed(senderId, message)
 	}
 }
 
@@ -92,6 +94,64 @@ func (g *InGame) handleSporeConsumed(senderId uint64, message *packets.Packet_Sp
 	go g.client.SharedGameObjects().Spores.Remove(sporeId)
 
 	g.client.Broadcast(message)
+}
+
+func (g *InGame) handlePlayerConsumed(senderId uint64, message *packets.Packet_PlayerConsumed) {
+	if senderId != g.client.Id() {
+		g.client.SocketSendAs(message, senderId)
+
+		if message.PlayerConsumed.PlayerId == g.client.Id() {
+			log.Println("Player was consumed, respawning")
+			g.client.SetState(&InGame{
+				player: &objects.Player{
+					Name: g.player.Name,
+				},
+			})
+		}
+
+		return
+	}
+
+	// If the other player was supposedly consumed by our own player, we need to verify the plausibility of the event
+	errMsg := "Could not verify player consumption: "
+
+	// First, check if the player exists
+	otherId := message.PlayerConsumed.PlayerId
+	other, err := g.getOtherPlayer(otherId)
+	if err != nil {
+		g.logger.Println(errMsg + err.Error())
+		return
+	}
+
+	// Next, check the other player's mass is smaller than our player's
+	ourMass := radToMass(g.player.Radius)
+	otherMass := radToMass(other.Radius)
+	if ourMass <= otherMass*1.5 {
+		g.logger.Printf(errMsg+"player not massive enough to consume the other player (our radius: %f, other radius: %f)", g.player.Radius, other.Radius)
+		return
+	}
+
+	// Finally, check if the player is close enough to the other to be consumed
+	err = g.validatePlayerCloseToObject(other.X, other.Y, other.Radius, 10)
+	if err != nil {
+		g.logger.Println(errMsg + err.Error())
+		return
+	}
+
+	// If we made it this far, the player consumption is valid, so grow the player, remove the consumed other, and broadcast the event
+	g.player.Radius = g.nextRadius(otherMass)
+
+	go g.client.SharedGameObjects().Players.Remove(otherId)
+
+	g.client.Broadcast(message)
+}
+
+func (g *InGame) getOtherPlayer(otherId uint64) (*objects.Player, error) {
+	other, exists := g.client.SharedGameObjects().Players.Get(otherId)
+	if !exists {
+		return nil, fmt.Errorf("player with ID %d does not exist", otherId)
+	}
+	return other, nil
 }
 
 func (g *InGame) handlePlayerDirection(senderId uint64, message *packets.Packet_PlayerDirection) {

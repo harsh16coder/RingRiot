@@ -46,8 +46,38 @@ func _add_actor(actor_id: int, actor_name: String, x: float, y: float, radius: f
 func _on_player_area_entered(area: Area2D) -> void:
 	if area is Spore:
 		_consume_spore(area as Spore)
+	elif area is Actor:
+		_collide_actor(area as Actor)
+
+func _collide_actor(actor: Actor) -> void:
+	var player := _players[GameManager.client_id]
+	var player_mass := _rad_to_mass(player.radius)
+	var actor_mass := _rad_to_mass(actor.radius)
+
+	if player_mass > actor_mass * 1.5:
+		_consume_actor(actor)
+
+func _consume_actor(actor: Actor) -> void:
+	var player := _players[GameManager.client_id]
+	var player_mass := _rad_to_mass(player.radius)
+	var actor_mass := _rad_to_mass(actor.radius)
+	_set_actor_mass(player, player_mass + actor_mass)
+
+	var packet := packets.Packet.new()
+	var player_consumed_msg := packet.new_player_consumed()
+	player_consumed_msg.set_player_id(actor.actor_id)
+	WS.send(packet)
+	_remove_actor(actor)
+	
+func _remove_actor(actor: Actor) -> void:
+	_players.erase(actor.actor_id)
+	actor.queue_free()
 
 func _consume_spore(spore: Spore) -> void:
+	var player = _players[GameManager.client_id]
+	var player_mass := _rad_to_mass(player.radius)
+	var spore_mass := _rad_to_mass(spore.radius)
+	_set_actor_mass(player, player_mass + spore_mass)
 	var packet := packets.Packet.new()
 	var spore_consumed_msg := packet.new_spore_consumed()
 	spore_consumed_msg.set_spore_id(spore.spore_id)
