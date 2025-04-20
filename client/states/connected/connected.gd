@@ -15,6 +15,10 @@ func _ready() -> void:
 	WS.connection_closed.connect(_on_ws_connection_closed)
 	_login_button.pressed.connect(_on_login_button_pressed)
 	_register_button.pressed.connect(_on_register_button_pressed)
+	var _hiscores := $UI/VBoxContainer/Hiscores as Hiscores
+	_hiscores.set_hiscore("Bob Barker", 10000)
+	_hiscores.set_hiscore("Adam Sandler", 5000)
+	_hiscores.set_hiscore("Tristan", 5001)
 
 func _on_ws_packet_received(packet: packets.Packet) -> void:
 	var sender_id := packet.get_sender_id()

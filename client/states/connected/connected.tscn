@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://b3jrfikcqy3o1"]
+[gd_scene load_steps=4 format=3 uid="uid://b3jrfikcqy3o1"]
 
 [ext_resource type="Script" uid="uid://dbx0c14r0r5uq" path="res://states/connected/connected.gd" id="1_idi6s"]
 [ext_resource type="Script" uid="uid://b4el1fjc2gkm1" path="res://classes/log/log.gd" id="2_kh2bm"]
+[ext_resource type="PackedScene" uid="uid://6y1bk18r3x6e" path="res://classes/hiscores/hiscores.tscn" id="3_kh2bm"]
 
 [node name="Connected" type="Node"]
 script = ExtResource("1_idi6s")
@@ -42,3 +43,7 @@ custom_minimum_size = Vector2(0, 200)
 layout_mode = 2
 script = ExtResource("2_kh2bm")
 metadata/_custom_type_script = "uid://b4el1fjc2gkm1"
+
+[node name="Hiscores" parent="UI/VBoxContainer" instance=ExtResource("3_kh2bm")]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
