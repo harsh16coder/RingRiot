@@ -3,8 +3,9 @@ extends Node
 const packets := preload("res://packets.gd")
 const Actor := preload("res://objects/actor/actor.gd")
 const Spore := preload("res://objects/spore/spore.gd")
-@onready var _line_edit: LineEdit = $UI/LineEdit
-@onready var _log: Log = $UI/Log
+@onready var _line_edit: LineEdit = $UI/VBoxContainer/LineEdit
+@onready var _log: Log = $UI/VBoxContainer/Log
+@onready var _hiscores: Hiscores = $UI/VBoxContainer/Hiscores
 
 @onready var _world: Node2D = $World
 
@@ -39,6 +40,7 @@ func _handle_player_msg(sender_id: int, player_msg: packets.PlayerMessage) -> vo
 func _add_actor(actor_id: int, actor_name: String, x: float, y: float, radius: float, speed: float, is_player: bool) -> void:
 	var actor := Actor.instantiate(actor_id, actor_name, x, y, radius, speed, is_player)
 	_world.add_child(actor)
+	_set_actor_mass(actor, _rad_to_mass(radius))
 	_players[actor_id] = actor
 	if is_player:
 		actor.area_entered.connect(_on_player_area_entered)
@@ -72,6 +74,7 @@ func _consume_actor(actor: Actor) -> void:
 func _remove_actor(actor: Actor) -> void:
 	_players.erase(actor.actor_id)
 	actor.queue_free()
+	_hiscores.remove_hiscore(actor.actor_name)
 
 func _consume_spore(spore: Spore) -> void:
 	var player = _players[GameManager.client_id]
@@ -90,7 +93,7 @@ func _remove_spore(spore: Spore) -> void:
 
 func _update_actor(actor_id: int, x: float, y: float, direction: float, speed: float, radius: float, is_player: bool) -> void:
 	var actor := _players[actor_id]
-	actor.radius = radius
+	_set_actor_mass(actor, _rad_to_mass(radius))
 	if actor.position.distance_squared_to(Vector2(x, y)) > 100:
 		actor.position.x = x
 		actor.position.y = y
@@ -129,6 +132,7 @@ func _rad_to_mass(radius: float) -> float:
 
 func _set_actor_mass(actor: Actor, new_mass: float) -> void:
 	actor.radius = sqrt(new_mass / PI)
+	_hiscores.set_hiscore(actor.actor_name, roundi(new_mass))
 
 func _handle_spores_batch_msg(sender_id: int, spores_batch_msg: packets.SporesBatchMessage) -> void:
 	for spore_msg in spores_batch_msg.get_spores():

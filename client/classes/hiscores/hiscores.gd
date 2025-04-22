@@ -6,6 +6,9 @@ var _scores: Array[int]
 @onready var _vbox: VBoxContainer = $VBoxContainer
 @onready var _entry_template: HBoxContainer = $VBoxContainer/HBoxContainer
 
+func _ready() -> void:
+	_entry_template.hide()
+	
 func set_hiscore(name: String, score: int) -> void:
 	remove_hiscore(name)
 	_add_hiscore(name, score)

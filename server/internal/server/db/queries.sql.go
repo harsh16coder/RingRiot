@@ -9,6 +9,32 @@ import (
 	"context"
 )
 
+const createPlayer = `-- name: CreatePlayer :one
+INSERT INTO players (
+    user_id, name
+) VALUES (
+    ?, ?
+)
+RETURNING id, user_id, name, best_score
+`
+
+type CreatePlayerParams struct {
+	UserID int64
+	Name   string
+}
+
+func (q *Queries) CreatePlayer(ctx context.Context, arg CreatePlayerParams) (Player, error) {
+	row := q.db.QueryRowContext(ctx, createPlayer, arg.UserID, arg.Name)
+	var i Player
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Name,
+		&i.BestScore,
+	)
+	return i, err
+}
+
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (
     username, password_hash
@@ -30,6 +56,23 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	return i, err
 }
 
+const getPlayerByUserID = `-- name: GetPlayerByUserID :one
+SELECT id, user_id, name, best_score FROM players
+WHERE user_id = ? LIMIT 1
+`
+
+func (q *Queries) GetPlayerByUserID(ctx context.Context, userID int64) (Player, error) {
+	row := q.db.QueryRowContext(ctx, getPlayerByUserID, userID)
+	var i Player
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Name,
+		&i.BestScore,
+	)
+	return i, err
+}
+
 const getUserByUsername = `-- name: GetUserByUsername :one
 SELECT id, username, password_hash FROM users
 WHERE username = ? LIMIT 1
@@ -40,4 +83,20 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User,
 	var i User
 	err := row.Scan(&i.ID, &i.Username, &i.PasswordHash)
 	return i, err
+}
+
+const updatePlayerBestScore = `-- name: UpdatePlayerBestScore :exec
+UPDATE players
+SET best_score = ?
+WHERE id = ?
+`
+
+type UpdatePlayerBestScoreParams struct {
+	BestScore int64
+	ID        int64
+}
+
+func (q *Queries) UpdatePlayerBestScore(ctx context.Context, arg UpdatePlayerBestScoreParams) error {
+	_, err := q.db.ExecContext(ctx, updatePlayerBestScore, arg.BestScore, arg.ID)
+	return err
 }
