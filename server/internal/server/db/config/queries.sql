@@ -26,3 +26,10 @@ WHERE user_id = ? LIMIT 1;
 UPDATE players
 SET best_score = ?
 WHERE id = ?;
+
+-- name: GetTopScores :many
+SELECT name, best_score
+FROM players
+ORDER BY best_score DESC
+LIMIT ?
+OFFSET ?;

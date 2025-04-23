@@ -43,6 +43,8 @@ func (c *Connected) HandlerMessage(senderId uint64, message packets.Msg) {
 		c.handleLoginRequest(senderId, message)
 	case *packets.Packet_RegisterRequest:
 		c.handleRegisterRequest(senderId, message)
+	case *packets.Packet_HiscoreBoardRequest:
+		c.handleHiscoreBoardRequest(senderId, message)
 	}
 }
 
@@ -147,6 +149,10 @@ func (c *Connected) handleRegisterRequest(senderId uint64, message *packets.Pack
 	c.client.SocketSend(packets.NewOkResponse())
 
 	c.logger.Printf("User %s registered successfully", username)
+}
+
+func (c *Connected) handleHiscoreBoardRequest(senderId uint64, message *packets.Packet_HiscoreBoardRequest) {
+	c.client.SetState(&BrowsingHiscores{})
 }
 
 func validateUsername(username string) error {

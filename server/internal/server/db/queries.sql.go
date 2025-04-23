@@ -73,6 +73,47 @@ func (q *Queries) GetPlayerByUserID(ctx context.Context, userID int64) (Player, 
 	return i, err
 }
 
+const getTopScores = `-- name: GetTopScores :many
+SELECT name, best_score
+FROM players
+ORDER BY best_score DESC
+LIMIT ?
+OFFSET ?
+`
+
+type GetTopScoresParams struct {
+	Limit  int64
+	Offset int64
+}
+
+type GetTopScoresRow struct {
+	Name      string
+	BestScore int64
+}
+
+func (q *Queries) GetTopScores(ctx context.Context, arg GetTopScoresParams) ([]GetTopScoresRow, error) {
+	rows, err := q.db.QueryContext(ctx, getTopScores, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetTopScoresRow
+	for rows.Next() {
+		var i GetTopScoresRow
+		if err := rows.Scan(&i.Name, &i.BestScore); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getUserByUsername = `-- name: GetUserByUsername :one
 SELECT id, username, password_hash FROM users
 WHERE username = ? LIMIT 1
