@@ -77,8 +77,8 @@ func _remove_actor(actor: Actor) -> void:
 	_hiscores.remove_hiscore(actor.actor_name)
 
 func _consume_spore(spore: Spore) -> void:
-	if spore.underneath_player:
-		return
+	#if spore.underneath_player:
+		#return
 	var player = _players[GameManager.client_id]
 	var player_mass := _rad_to_mass(player.radius)
 	var spore_mass := _rad_to_mass(spore.radius)

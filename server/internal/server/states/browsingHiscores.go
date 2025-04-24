@@ -29,9 +29,47 @@ func (b *BrowsingHiscores) SetClient(client server.ClientInterfacer) {
 }
 
 func (b *BrowsingHiscores) OnEnter() {
-	const limit int64 = 10
-	const offset int64 = 0
+	b.sendTopScores(10, 0)
+}
 
+func (b *BrowsingHiscores) HandlerMessage(senderId uint64, message packets.Msg) {
+	switch message := message.(type) {
+	case *packets.Packet_FinishedBrowsingHiscores:
+		b.handleFinishedBrowsingHiscores(senderId, message)
+	case *packets.Packet_SearchHiscore:
+		b.handleSearchHiscore(senderId, message)
+	}
+}
+
+func (b *BrowsingHiscores) OnExit() {
+}
+
+func (b *BrowsingHiscores) handleFinishedBrowsingHiscores(_ uint64, _ *packets.Packet_FinishedBrowsingHiscores) {
+	b.client.SetState(&Connected{})
+}
+
+func (b *BrowsingHiscores) handleSearchHiscore(_ uint64, message *packets.Packet_SearchHiscore) {
+	player, err := b.queries.GetPlayerByName(b.dbCtx, message.SearchHiscore.Name)
+
+	if err != nil {
+		b.logger.Printf("Error getting player %s: %v", message.SearchHiscore.Name, err)
+		b.client.SocketSend(packets.NewDenyResponse("No player found with that name"))
+		return
+	}
+
+	playerRank, err := b.queries.GetPlayerRank(b.dbCtx, player.ID)
+	if err != nil {
+		b.logger.Printf("Error getting rank for player %s: %v", message.SearchHiscore.Name, err)
+		b.client.SocketSend(packets.NewDenyResponse("Player is unranked"))
+		return
+	}
+
+	const limit int64 = 10
+	offset := playerRank - limit/2
+	b.sendTopScores(limit, max(0, offset))
+}
+
+func (b *BrowsingHiscores) sendTopScores(limit int64, offset int64) {
 	topScores, err := b.queries.GetTopScores(b.dbCtx, db.GetTopScoresParams{
 		Limit:  limit,
 		Offset: offset,
@@ -53,18 +91,4 @@ func (b *BrowsingHiscores) OnEnter() {
 	}
 
 	b.client.SocketSend(packets.NewHiscoreBoard(hiscoreMessages))
-}
-
-func (b *BrowsingHiscores) HandlerMessage(senderId uint64, message packets.Msg) {
-	switch message := message.(type) {
-	case *packets.Packet_FinishedBrowsingHiscores:
-		b.handleFinishedBrowsingHiscores(senderId, message)
-	}
-}
-
-func (b *BrowsingHiscores) OnExit() {
-}
-
-func (b *BrowsingHiscores) handleFinishedBrowsingHiscores(_ uint64, _ *packets.Packet_FinishedBrowsingHiscores) {
-	b.client.SetState(&Connected{})
 }
