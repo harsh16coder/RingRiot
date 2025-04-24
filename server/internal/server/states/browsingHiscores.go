@@ -56,7 +56,15 @@ func (b *BrowsingHiscores) OnEnter() {
 }
 
 func (b *BrowsingHiscores) HandlerMessage(senderId uint64, message packets.Msg) {
+	switch message := message.(type) {
+	case *packets.Packet_FinishedBrowsingHiscores:
+		b.handleFinishedBrowsingHiscores(senderId, message)
+	}
 }
 
 func (b *BrowsingHiscores) OnExit() {
+}
+
+func (b *BrowsingHiscores) handleFinishedBrowsingHiscores(_ uint64, _ *packets.Packet_FinishedBrowsingHiscores) {
+	b.client.SetState(&Connected{})
 }

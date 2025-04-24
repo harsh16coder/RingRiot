@@ -19,6 +19,7 @@ message PlayerConsumedMessage { uint64 player_id = 1; }
 message HiscoreBoardRequestMessage { }
 message HiscoreMessage { uint64 rank = 1; string name = 2; uint64 score = 3; }
 message HiscoreBoardMessage { repeated HiscoreMessage hiscores = 1; }
+message FinishedBrowsingHiscoresMessage { }
 
 message Packet {
     uint64 sender_id = 1;
@@ -38,5 +39,6 @@ message Packet {
         HiscoreBoardRequestMessage hiscore_board_request = 14;
         HiscoreMessage hiscore = 15;
         HiscoreBoardMessage hiscore_board = 16;
+        FinishedBrowsingHiscoresMessage finished_browsing_hiscores = 17;
     }
 }
