@@ -77,6 +77,8 @@ func _remove_actor(actor: Actor) -> void:
 	_hiscores.remove_hiscore(actor.actor_name)
 
 func _consume_spore(spore: Spore) -> void:
+	if spore.underneath_player:
+		return
 	var player = _players[GameManager.client_id]
 	var player_mass := _rad_to_mass(player.radius)
 	var spore_mass := _rad_to_mass(spore.radius)
@@ -160,8 +162,15 @@ func _handle_spore_msg(sender_id: int, spore_msg: packets.SporeMessage) -> void:
 	var x := spore_msg.get_x()
 	var y := spore_msg.get_y()
 	var radius := spore_msg.get_radius()
+	var underneath_player := false
+	if GameManager.client_id in _players:
+		var player := _players[GameManager.client_id]
+		var player_pos := Vector2(player.position.x, player.position.y)
+		var spore_pos := Vector2(x, y)
+		underneath_player = player_pos.distance_squared_to(spore_pos) < player.radius * player.radius
+
 	
 	if spore_id not in _spores:
-		var spore := Spore.instantiate(spore_id, x, y, radius)
+		var spore := Spore.instantiate(spore_id, x, y, radius, underneath_player)
 		_world.add_child(spore)
 		_spores[spore_id] = spore

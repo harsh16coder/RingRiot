@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"math/rand/v2"
 	"server/internal/server"
 	"server/internal/server/db"
 	"server/internal/server/objects"
@@ -218,6 +219,22 @@ func (g *InGame) syncPlayer(delta float64) {
 
 	g.player.X = newX
 	g.player.Y = newY
+
+	// Drop a spore
+	probability := g.player.Radius / float64(server.MaxSpores*5)
+	if rand.Float64() < probability && g.player.Radius > 10 {
+		spore := &objects.Spore{
+			X:      g.player.X,
+			Y:      g.player.Y,
+			Radius: min(5+g.player.Radius/50, 15),
+		}
+		sporeId := g.client.SharedGameObjects().Spores.Add(spore)
+		g.client.Broadcast(packets.NewSpore(sporeId, spore))
+		go g.client.SocketSend(packets.NewSpore(sporeId, spore))
+		g.player.Radius = g.nextRadius(-radToMass(spore.Radius))
+	}
+
+	// Broadcast the updated player state
 
 	updatePacket := packets.NewPlayer(g.client.Id(), g.player)
 	g.client.Broadcast(updatePacket)
