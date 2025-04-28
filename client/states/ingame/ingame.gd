@@ -115,6 +115,8 @@ func _on_ws_packet_received(packet: packets.Packet) -> void:
 		_handle_spores_batch_msg(sender_id, packet.get_spores_batch())
 	elif packet.has_spore_consumed():
 		_handle_spore_consumed_msg(sender_id, packet.get_spore_consumed())
+	elif packet.has_disconnect():
+		_handle_disconnect_msg(sender_id, packet.get_disconnect())
 
 func  _handle_spore_consumed_msg(sender_id: int, spore_consumed_msg: packets.SporeConsumedMessage) -> void:
 	if sender_id in _players:
@@ -174,3 +176,10 @@ func _handle_spore_msg(sender_id: int, spore_msg: packets.SporeMessage) -> void:
 		var spore := Spore.instantiate(spore_id, x, y, radius, underneath_player)
 		_world.add_child(spore)
 		_spores[spore_id] = spore
+
+func _handle_disconnect_msg(sender_id: int, disconnect_msg: packets.DisconnectMessage) -> void:
+	if sender_id in _players:
+		var player := _players[sender_id]
+		var reason := disconnect_msg.get_reason()
+		_log.info("%s disconnected because %s" % [player.actor_name, reason])
+		_remove_actor(player)

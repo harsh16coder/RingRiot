@@ -164,6 +164,7 @@ func (c *WebSocketClient) SharedGameObjects() *server.SharedGameObjects {
 
 func (c *WebSocketClient) Close(reason string) {
 	c.logger.Printf("Closing client connection because: %s", reason)
+	c.Broadcast(packets.NewDisconnect(reason))
 	c.SetState(nil)
 	c.hub.UnregisterChan <- c
 	c.conn.Close()
