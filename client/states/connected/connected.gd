@@ -4,12 +4,12 @@ const packets := preload("res://packets.gd")
 
 var _action_on_ok_received: Callable
 
-@onready var _username_field: LineEdit = $UI/VBoxContainer/Username
-@onready var _password_field: LineEdit = $UI/VBoxContainer/Password
-@onready var _login_button: Button = $UI/VBoxContainer/HBoxContainer/LoginButton
-@onready var _register_button: Button = $UI/VBoxContainer/HBoxContainer/RegisterButton
-@onready var _hiscores_button: Button = $UI/VBoxContainer/HBoxContainer/HiscoresButton
-@onready var _log: Log = $UI/VBoxContainer/Log
+@onready var _username_field: LineEdit = $UI/MarginContainer/VBoxContainer/Username
+@onready var _password_field: LineEdit = $UI/MarginContainer/VBoxContainer/Password
+@onready var _login_button: Button = $UI/MarginContainer/VBoxContainer/HBoxContainer/LoginButton
+@onready var _register_button: Button = $UI/MarginContainer/VBoxContainer/HBoxContainer/RegisterButton
+@onready var _hiscores_button: Button = $UI/MarginContainer/VBoxContainer/HBoxContainer/HiscoresButton
+@onready var _log: Log = $UI/MarginContainer/VBoxContainer/Log
 
 func _ready() -> void:
 	WS.packet_received.connect(_on_ws_packet_received)

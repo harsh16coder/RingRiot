@@ -3,9 +3,11 @@ extends Node
 const packets := preload("res://packets.gd")
 const Actor := preload("res://objects/actor/actor.gd")
 const Spore := preload("res://objects/spore/spore.gd")
-@onready var _line_edit: LineEdit = $UI/VBoxContainer/LineEdit
-@onready var _log: Log = $UI/VBoxContainer/Log
-@onready var _hiscores: Hiscores = $UI/VBoxContainer/Hiscores
+@onready var _line_edit: LineEdit = $UI/MarginContainer/VBoxContainer/HBoxContainer/LineEdit
+@onready var _log: Log = $UI/MarginContainer/VBoxContainer/Log
+@onready var _hiscores: Hiscores = $UI/MarginContainer/VBoxContainer/Hiscores
+@onready var _send_button: Button = $UI/MarginContainer/VBoxContainer/HBoxContainer/SendButton
+@onready var _logout_button: Button = $UI/MarginContainer/VBoxContainer/HBoxContainer/LogoutButton
 
 @onready var _world: Node2D = $World
 
@@ -18,6 +20,8 @@ func _ready() -> void:
 	WS.packet_received.connect(_on_ws_packet_received)
 
 	_line_edit.text_submitted.connect(_on_line_edit_text_entered)
+	_logout_button.pressed.connect(_on_logout_button_pressed)
+	_send_button.pressed.connect(_on_send_button_pressed)
 
 func _on_ws_connection_closed() -> void:
 	_log.error("Connection closed")
@@ -183,3 +187,13 @@ func _handle_disconnect_msg(sender_id: int, disconnect_msg: packets.DisconnectMe
 		var reason := disconnect_msg.get_reason()
 		_log.info("%s disconnected because %s" % [player.actor_name, reason])
 		_remove_actor(player)
+
+func _on_logout_button_pressed() -> void:
+	var packet := packets.Packet.new()
+	var disconnect_msg := packet.new_disconnect()
+	disconnect_msg.set_reason("logged out")
+	WS.send(packet)
+	GameManager.set_state(GameManager.State.CONNECTED)
+	
+func _on_send_button_pressed() -> void:
+	_on_line_edit_text_entered(_line_edit.text)
