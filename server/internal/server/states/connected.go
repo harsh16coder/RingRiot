@@ -89,6 +89,7 @@ func (c *Connected) handleLoginRequest(senderId uint64, message *packets.Packet_
 			Name:      player.Name,
 			DbId:      player.ID,
 			BestScore: player.BestScore,
+			Color:     int32(player.Color),
 		},
 	})
 
@@ -136,9 +137,11 @@ func (c *Connected) handleRegisterRequest(senderId uint64, message *packets.Pack
 		c.client.SocketSend(genericFailMessage)
 		return
 	}
+	//Add player here
 	_, err = c.queries.CreatePlayer(c.dbCtx, db.CreatePlayerParams{
 		UserID: user.ID,
 		Name:   message.RegisterRequest.Username,
+		Color:  int64(message.RegisterRequest.Color),
 	})
 	if err != nil {
 		c.logger.Printf("Failed to create player for user %s: %v", username, err)
