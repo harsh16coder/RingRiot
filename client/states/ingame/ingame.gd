@@ -33,17 +33,20 @@ func _handle_player_msg(sender_id: int, player_msg: packets.PlayerMessage) -> vo
 	var y := player_msg.get_y()
 	var radius := player_msg.get_radius()
 	var speed := player_msg.get_speed()
+	var color_hex := player_msg.get_color()
+	var color := Color.hex(color_hex)
 	
 	var is_player := actor_id == GameManager.client_id
 	if actor_id not in _players:
-		_add_actor(actor_id, actor_name, x, y, radius, speed, is_player)
+		_add_actor(actor_id, actor_name, x, y, radius, speed, color, is_player)
 	else:
 		var direction := player_msg.get_direction()
 		_update_actor(actor_id, x, y, direction, speed, radius, is_player)
 
-func _add_actor(actor_id: int, actor_name: String, x: float, y: float, radius: float, speed: float, is_player: bool) -> void:
-	var actor := Actor.instantiate(actor_id, actor_name, x, y, radius, speed, is_player)
+func _add_actor(actor_id: int, actor_name: String, x: float, y: float, radius: float, speed: float,color: Color, is_player: bool) -> void:
+	var actor := Actor.instantiate(actor_id, actor_name, x, y, radius, speed, color, is_player)
 	_world.add_child(actor)
+	actor.z_index = 1
 	_set_actor_mass(actor, _rad_to_mass(radius))
 	_players[actor_id] = actor
 	if is_player:
@@ -101,8 +104,8 @@ func _update_actor(actor_id: int, x: float, y: float, direction: float, speed: f
 	var actor := _players[actor_id]
 	_set_actor_mass(actor, _rad_to_mass(radius))
 	if actor.position.distance_squared_to(Vector2(x, y)) > 100:
-		actor.position.x = x
-		actor.position.y = y
+		actor.server_position.x = x
+		actor.server_position.y = y
 	if not is_player:
 		actor.velocity = Vector2.from_angle(direction) * speed
 		

@@ -36,7 +36,7 @@ func _on_login_form_submitted(username: String, password: String) -> void:
 	WS.send(packet)
 	_action_on_ok_received = func(): GameManager.set_state(GameManager.State.INGAME)
 	
-func _on_register_form_submitted(username: String, password: String, confirm_password: String) -> void:
+func _on_register_form_submitted(username: String, password: String, confirm_password: String, color: Color) -> void:
 	if password != confirm_password:
 		_log.error("Passwords do not match")
 		return
@@ -45,6 +45,7 @@ func _on_register_form_submitted(username: String, password: String, confirm_pas
 	var register_request_msg := packet.new_register_request()
 	register_request_msg.set_username(username)
 	register_request_msg.set_password(password)
+	register_request_msg.set_color(color.to_rgba32())
 	WS.send(packet)
 	_action_on_ok_received = func(): _log.success("Registration successful! Go back and log in with your new account.")
 	_login_form.show()
