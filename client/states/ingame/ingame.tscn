@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://bobyf230fc7bh"]
+[gd_scene load_steps=6 format=3 uid="uid://bobyf230fc7bh"]
 
 [ext_resource type="Script" uid="uid://c8uc7dhcmnrqk" path="res://states/ingame/ingame.gd" id="1_0uskn"]
 [ext_resource type="PackedScene" uid="uid://6y1bk18r3x6e" path="res://classes/hiscores/hiscores.tscn" id="2_ll2wp"]
 [ext_resource type="Script" uid="uid://b4el1fjc2gkm1" path="res://classes/log/log.gd" id="2_q22go"]
+[ext_resource type="Theme" uid="uid://begl6y18nyus" path="res://resources/game_theme.tres" id="2_ube6o"]
 [ext_resource type="Texture2D" uid="uid://bg6oiyebgt0j5" path="res://resources/floor.svg" id="2_wuwgw"]
 
 [node name="InGame" type="Node"]
@@ -16,6 +17,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("2_ube6o")
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20

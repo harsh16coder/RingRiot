@@ -1,7 +1,8 @@
-[gd_scene load_steps=8 format=3 uid="uid://b3jrfikcqy3o1"]
+[gd_scene load_steps=9 format=3 uid="uid://b3jrfikcqy3o1"]
 
 [ext_resource type="Script" uid="uid://dbx0c14r0r5uq" path="res://states/connected/connected.gd" id="1_idi6s"]
 [ext_resource type="Script" uid="uid://b4el1fjc2gkm1" path="res://classes/log/log.gd" id="2_kh2bm"]
+[ext_resource type="Theme" uid="uid://begl6y18nyus" path="res://resources/game_theme.tres" id="2_o1o5k"]
 [ext_resource type="PackedScene" uid="uid://bd6yi4spntv80" path="res://classes/login_form/login_form.tscn" id="2_rp112"]
 [ext_resource type="PackedScene" uid="uid://dt56njkmyl324" path="res://classes/register_form/register_form.tscn" id="3_o1o5k"]
 [ext_resource type="Shader" uid="uid://doeshfjjrror0" path="res://resources/background_effect.gdshader" id="4_tk3qr"]
@@ -26,6 +27,7 @@ offset_right = 1.0
 offset_bottom = 112.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("2_o1o5k")
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20
@@ -37,7 +39,7 @@ layout_mode = 2
 
 [node name="RichTextLabel" type="RichTextLabel" parent="UI/MarginContainer/VBoxContainer"]
 layout_mode = 2
-theme_override_font_sizes/bold_font_size = 48
+theme_override_font_sizes/bold_font_size = 65
 bbcode_enabled = true
 text = "[center][b][shake][rainbow]Ring Riot[/rainbow][/shake][/b][/center]"
 fit_content = true

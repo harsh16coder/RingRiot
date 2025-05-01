@@ -1,6 +1,7 @@
-[gd_scene load_steps=7 format=3 uid="uid://xmq0flrwsawm"]
+[gd_scene load_steps=8 format=3 uid="uid://xmq0flrwsawm"]
 
 [ext_resource type="Script" uid="uid://blahnn5hk64c0" path="res://states/browsing_hiscores/browsing_hiscores.gd" id="1_gr358"]
+[ext_resource type="Theme" uid="uid://begl6y18nyus" path="res://resources/game_theme.tres" id="2_itgbc"]
 [ext_resource type="PackedScene" uid="uid://6y1bk18r3x6e" path="res://classes/hiscores/hiscores.tscn" id="2_jq3og"]
 [ext_resource type="Script" uid="uid://b4el1fjc2gkm1" path="res://classes/log/log.gd" id="3_jq3og"]
 [ext_resource type="Shader" uid="uid://doeshfjjrror0" path="res://resources/background_effect.gdshader" id="4_extph"]
@@ -29,6 +30,7 @@ offset_right = 300.0
 offset_bottom = 300.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("2_itgbc")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="UI/VBoxContainer"]
 layout_mode = 2
@@ -48,7 +50,7 @@ layout_mode = 2
 text = "Search"
 
 [node name="Hiscores" parent="UI/VBoxContainer" instance=ExtResource("2_jq3og")]
-custom_minimum_size = Vector2(400, 400)
+custom_minimum_size = Vector2(400, 300)
 layout_mode = 2
 
 [node name="Log" type="RichTextLabel" parent="UI/VBoxContainer"]
