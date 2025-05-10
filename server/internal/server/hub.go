@@ -7,6 +7,7 @@ import (
 	"log"
 	"math/rand/v2"
 	"net/http"
+	"path"
 	"server/internal/server/db"
 	"server/internal/server/objects"
 	"server/pkg/packets"
@@ -105,8 +106,8 @@ type Hub struct {
 	SharedGameObjects *SharedGameObjects
 }
 
-func NewHub() *Hub {
-	dbpool, err := sql.Open("sqlite", "db.sqlite")
+func NewHub(dataDirPath string) *Hub {
+	dbPool, err := sql.Open("sqlite", path.Join(dataDirPath, "db.sqlite"))
 
 	if err != nil {
 		log.Fatalf("Error opening database: %v", err)
@@ -117,7 +118,7 @@ func NewHub() *Hub {
 		BroadcastChan:  make(chan *packets.Packet),
 		RegisterChan:   make(chan ClientInterfacer),
 		UnregisterChan: make(chan ClientInterfacer),
-		dbPool:         dbpool,
+		dbPool:         dbPool,
 		SharedGameObjects: &SharedGameObjects{
 			Players: objects.NewSharedCollection[*objects.Player](),
 			Spores:  objects.NewSharedCollection[*objects.Spore](),
