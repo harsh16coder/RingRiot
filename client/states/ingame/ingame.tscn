@@ -42,7 +42,7 @@ layout_mode = 2
 text = "send"
 
 [node name="Hiscores" parent="UI/MarginContainer/VBoxContainer" instance=ExtResource("2_ll2wp")]
-custom_minimum_size = Vector2(200, 150)
+custom_minimum_size = Vector2(250, 150)
 layout_mode = 2
 size_flags_horizontal = 8
 
