@@ -1,16 +1,20 @@
 package states
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"log"
 	"math"
 	"math/rand/v2"
+	"os"
 	"server/internal/server"
 	"server/internal/server/db"
 	"server/internal/server/objects"
 	"server/pkg/packets"
+	"strings"
 	"time"
+	"unicode"
 )
 
 type InGame struct {
@@ -183,6 +187,10 @@ func (g *InGame) handlePlayerDirection(senderId uint64, message *packets.Packet_
 }
 
 func (g *InGame) handleChatMessage(senderId uint64, message *packets.Packet_Chat) {
+	msg, flag := filterMessageKeywords(message.Chat.Msg)
+	if flag {
+		message.Chat.Msg = msg
+	}
 	if senderId == g.client.Id() {
 		g.client.Broadcast(message)
 	} else {
@@ -335,4 +343,64 @@ func (g *InGame) syncPlayerBestScore() {
 		}
 	}
 
+}
+
+func normalizeWord(word string) string {
+	trimmedWord := strings.TrimFunc(word, func(r rune) bool {
+		return !unicode.IsLetter(r) && !unicode.IsNumber(r)
+	})
+	return strings.ToLower(trimmedWord)
+}
+
+func filterMessageKeywords(msg string) (string, bool) {
+	var bannedWordsPath = "banned_words.txt"
+	set := make(map[string]struct{})
+
+	// Read from file
+	if bannedWordsPath != "" {
+		file, err := os.Open(bannedWordsPath)
+		if err != nil {
+			return "failed to open", false
+		}
+		defer file.Close()
+
+		scanner := bufio.NewScanner(file)
+		for scanner.Scan() {
+			word := strings.ToLower(strings.TrimSpace(scanner.Text()))
+			if word != "" {
+				set[word] = struct{}{}
+			}
+		}
+		if err := scanner.Err(); err != nil {
+			return "failed to read", false
+		}
+	}
+
+	// Add default banned words
+	// defaultBannedWords := []string{"idiot", "stupid", "heck", "v1ol3ntword"}
+	// for _, bw := range defaultBannedWords {
+	// 	set[strings.ToLower(bw)] = struct{}{}
+	// }
+
+	originalWords := strings.Fields(msg)
+	if len(originalWords) == 0 {
+		return msg, false
+	}
+
+	modified := false
+	outputWords := make([]string, len(originalWords))
+	copy(outputWords, originalWords)
+
+	for i, currentWord := range originalWords {
+		normalized := normalizeWord(currentWord)
+		if _, isBanned := set[normalized]; isBanned {
+			outputWords[i] = strings.Repeat("*", len(currentWord))
+			modified = true
+		}
+	}
+
+	if modified {
+		return strings.Join(outputWords, " "), true
+	}
+	return msg, false
 }
