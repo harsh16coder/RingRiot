@@ -10,6 +10,8 @@ import (
 
 	"server/internal/server"
 	"server/internal/server/clients"
+
+	"github.com/joho/godotenv"
 )
 
 // If the server is running in a Docker container, the data directory is always mounted here:
@@ -32,12 +34,14 @@ func loadConfig() *config {
 	cfg.DataPath = os.Getenv("DATA_PATH")
 	fmt.Println(cfg.DataPath)
 	port, err := strconv.Atoi(os.Getenv("PORT"))
+	fmt.Println(port)
 	if err != nil {
 		log.Printf("Error parsing PORT, using %d", cfg.Port)
+		fmt.Println(err)
 		return cfg
 	}
 	cfg.Port = port
-	fmt.Println(cfg.DataPath)
+	fmt.Println(cfg.Port)
 	return cfg
 }
 
@@ -60,14 +64,13 @@ func coalescePaths(fallbacks ...string) string {
 
 func main() {
 	flag.Parse()
-	// err := godotenv.Load(*configPath)
-	// cfg := defaultConfig
-	cfg := loadConfig()
-	// if err != nil {
-	// 	log.Printf("Error loading config file, defaulting to %+v", defaultConfig)
-	// } else {
-	// 	cfg = loadConfig()
-	// }
+	err := godotenv.Load(*configPath)
+	cfg := defaultConfig
+	if err != nil {
+		log.Printf("Error loading config file, defaulting to %+v", defaultConfig)
+	} else {
+		cfg = loadConfig()
+	}
 
 	// Try to load the Docker-mounted data directory. If that fails,
 	// fall back to the current directory
@@ -85,7 +88,7 @@ func main() {
 
 	log.Printf("Starting server on %s", addr)
 
-	err := http.ListenAndServe(addr, nil)
+	err = http.ListenAndServe(addr, nil)
 	if err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
