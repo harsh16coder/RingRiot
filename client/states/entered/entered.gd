@@ -10,7 +10,7 @@ func _ready() -> void:
 	WS.packet_received.connect(_on_ws_packet_received)
 
 	_log.info("Connecting to server...")
-	WS.connect_to_url("ws://localhost:8080/ws")
+	WS.connect_to_url("wss://gameserver-229199095114.asia-south1.run.app/ws",TLSOptions.client())
 
 func _on_ws_connected_to_server() -> void:
 	_log.info("Connected to server")

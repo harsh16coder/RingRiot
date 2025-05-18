@@ -65,4 +65,4 @@ material = SubResource("ShaderMaterial_mcnxg")
 texture = ExtResource("5_itgbc")
 centered = false
 region_enabled = true
-region_rect = Rect2(0, 0, 2000, 1000)
+region_rect = Rect2(0, 0, 2300, 1200)
