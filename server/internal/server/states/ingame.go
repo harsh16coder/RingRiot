@@ -353,7 +353,7 @@ func normalizeWord(word string) string {
 }
 
 func filterMessageKeywords(msg string) (string, bool) {
-	var bannedWordsPath = "banned_words.txt"
+	var bannedWordsPath = "/gameserver/banned_words.txt"
 	set := make(map[string]struct{})
 
 	// Read from file

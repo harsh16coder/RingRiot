@@ -4,6 +4,9 @@ FROM golang:1.24.3-alpine AS builder
 # Set the working directory
 WORKDIR /usr/src/gameserver
 
+# Copy banned_words.txt into the image
+COPY banned_words.txt /gameserver/banned_words.txt
+
 # Copy dependency files and download modules
 COPY go.mod go.sum ./ 
 RUN go mod download && go mod verify
