@@ -25,6 +25,7 @@ RUN mkdir -p /gameserver
 
 # Copy the binary from builder stage
 COPY --from=builder /gameserver/main /gameserver/main
+COPY --from=builder /gameserver/banned_words.txt /gameserver/banned_words.txt
 
 # Copy the .env file if needed (optional; usually handled via volumes or env_file)
 # COPY .env .env
