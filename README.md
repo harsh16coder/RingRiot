@@ -23,8 +23,14 @@ Live demo: [RingRiot on GCP](https://harshgharat.itch.io/ring-riot)
 ---
 
 ## Screenshots
-loginpage: ![Login Page](https://raw.githubusercontent.com/harsh16coder/ringriot/main/screenshots/login.png)
-gameplay: ![Gameplay](https://raw.githubusercontent.com/harsh16coder/ringriot/main/screenshots/gameplay.png)
+loginpage: 
+<h1 align="center">
+  <a href="https://harshgharat.itch.io/ring-riot"><img width="250" src="https://github.com/harsh16coder/RingRiot/blob/master/LoginPage.png" /></a>
+</h1>
+gameplay: 
+<h1 align="center">
+  <a href="https://harshgharat.itch.io/ring-riot"><img width="250" src="https://github.com/harsh16coder/RingRiot/blob/master/Playground.png" /></a>
+</h1>
 
 ## Features
 
