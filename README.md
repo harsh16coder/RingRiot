@@ -1,11 +1,13 @@
 # RingRiot
 
 RingRiot is a real-time multiplayer game. The backend is written in Go and hosted on Google Cloud Platform (GCP), while the client is built using the Godot Engine with GDScript.
+Live demo: [RingRiot on GCP](https://harshgharat.itch.io/ring-riot)
 
 ---
 
 ## Table of Contents
 
+- [Screenshots](#screenshots)
 - [Features](#features)
 - [Architecture](#architecture)
 - [Requirements](#requirements)
@@ -19,6 +21,10 @@ RingRiot is a real-time multiplayer game. The backend is written in Go and hoste
 - [License](#license)
 
 ---
+
+## Screenshots
+loginpage: ![Login Page](https://raw.githubusercontent.com/harsh16coder/ringriot/main/screenshots/login.png)
+gameplay: ![Gameplay](https://raw.githubusercontent.com/harsh16coder/ringriot/main/screenshots/gameplay.png)
 
 ## Features
 
